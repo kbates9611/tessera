@@ -73,7 +73,12 @@ test("donut and treemap contracts support exact element edits", async ({
     contracts.treemapStyle,
     contracts.sankeyStyle,
     contracts.tableStyle,
-  ].forEach((tool) => expect(tool.annotations.idempotentHint).toBe(true));
+  ].forEach((tool) =>
+    expect(tool.annotations).toEqual({
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    }),
+  );
 
   await page.evaluate(async () => {
     const tools = (

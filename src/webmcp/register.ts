@@ -44,7 +44,17 @@ const WAREHOUSE_TOOLS = new Set([
   "build_dashboard_from_dataset",
 ]);
 
-const WEBMCP_CATALOG_VERSION = 11;
+const WEBMCP_CATALOG_VERSION = 12;
+
+const TRUSTED_STATIC_OUTPUT_TOOLS = new Set([
+  "list_tessera_tools",
+  "get_tessera_tool_schema",
+]);
+
+interface ModelContextToolAnnotations {
+  readOnlyHint?: boolean;
+  untrustedContentHint?: boolean;
+}
 
 interface ModelContext {
   registerTool: (
@@ -53,7 +63,7 @@ interface ModelContext {
       title: string;
       description: string;
       inputSchema: Record<string, unknown>;
-      annotations: Record<string, boolean>;
+      annotations: ModelContextToolAnnotations;
       execute: (
         args: Record<string, unknown>,
         options?: { signal?: AbortSignal },
@@ -100,19 +110,7 @@ export function registerWebMCPTools(bus: CommandBus): WebMCPRegistration {
         title: definition.title,
         description: definition.description,
         inputSchema: definition.inputSchema,
-        annotations: {
-          readOnlyHint: definition.readOnly,
-          ...(definition.name.startsWith("remove_")
-            ? { destructiveHint: true }
-            : {}),
-          ...(definition.readOnly ||
-          /^(?:style_|update_|set_dashboard_layout$)/.test(definition.name)
-            ? { idempotentHint: true }
-            : {}),
-          ...(/dataset|table|refresh|source|clean/.test(definition.name)
-            ? { untrustedContentHint: true }
-            : {}),
-        },
+        annotations: toolAnnotations(definition),
         execute: async (args = {}, options) => {
           if (options?.signal?.aborted)
             throw new DOMException(
@@ -140,6 +138,17 @@ export function registerWebMCPTools(bus: CommandBus): WebMCPRegistration {
       controller.abort();
       disposers.forEach((dispose) => dispose());
     },
+  };
+}
+
+function toolAnnotations(
+  definition: ToolDefinition,
+): ModelContextToolAnnotations {
+  return {
+    readOnlyHint: definition.readOnly,
+    ...(!TRUSTED_STATIC_OUTPUT_TOOLS.has(definition.name)
+      ? { untrustedContentHint: true }
+      : {}),
   };
 }
 

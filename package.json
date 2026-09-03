@@ -2,8 +2,12 @@
   "name": "tessera",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
   "description": "A project-scoped data warehouse and dashboard studio where every operation is available to people and to WebMCP agents alike.",
   "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "concurrently --kill-others-on-fail --names api,ui --prefix-colors blue,magenta \"node --watch server/index.mjs\" \"vite\"",
     "dev:test": "cross-env TESSERA_TEST_MODE=1 npm run dev",

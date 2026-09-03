@@ -531,7 +531,10 @@ test("WebMCP gauge tools expose named elements and recolor only the target", asy
     "stable id",
   );
   expect(contract.style.description).toContain("exactly one");
-  expect(contract.style.annotations.idempotentHint).toBe(true);
+  expect(contract.style.annotations).toEqual({
+    readOnlyHint: false,
+    untrustedContentHint: true,
+  });
   expect(contract.style.inputSchema.properties.element.description).toContain(
     "recolor",
   );

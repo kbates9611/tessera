@@ -4,6 +4,8 @@ dist/
 playwright-report/
 test-results/
 coverage/
+.devpost-hackathon-state.json
+devpost-submission.md
 .env
 .env.*
 !.env.example

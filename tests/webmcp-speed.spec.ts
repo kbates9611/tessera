@@ -5,6 +5,7 @@ declare global {
     __tesseraFastTools: Record<
       string,
       {
+        annotations: Record<string, boolean>;
         execute: (args: Record<string, unknown>) => Promise<unknown>;
       }
     >;
@@ -22,6 +23,7 @@ test.beforeEach(async ({ page }) => {
         codexGetTools() {},
         registerTool(tool: {
           name: string;
+          annotations: Record<string, boolean>;
           execute: (args: Record<string, unknown>) => Promise<unknown>;
         }) {
           window.__tesseraFastTools[tool.name] = tool;
@@ -54,6 +56,39 @@ test("native WebMCP exposes a lightweight gateway with mutation snapshots", asyn
     "run_tessera_tool",
   ]);
   expect(names).not.toContain("style_bar");
+
+  const annotations = await page.evaluate(() =>
+    Object.fromEntries(
+      Object.entries(window.__tesseraFastTools).map(([name, tool]) => [
+        name,
+        tool.annotations,
+      ]),
+    ),
+  );
+  expect(annotations).toEqual({
+    add_generated_illustration_card: {
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    },
+    build_dashboard_fast: {
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    },
+    get_project_context: {
+      readOnlyHint: true,
+      untrustedContentHint: true,
+    },
+    get_tessera_tool_schema: { readOnlyHint: true },
+    inspect_dashboard: {
+      readOnlyHint: true,
+      untrustedContentHint: true,
+    },
+    list_tessera_tools: { readOnlyHint: true },
+    run_tessera_tool: {
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    },
+  });
 
   const result = await page.evaluate(async () => {
     const added = (await window.__tesseraFastTools.run_tessera_tool.execute({
