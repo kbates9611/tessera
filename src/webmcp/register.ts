@@ -16,10 +16,12 @@ import {
  * (list → schema → run). Lightweight shims receive the flat catalog instead.
  */
 
-/** Publication gates that only a person can pass, from the Tessera UI. */
+/** Safety and publication gates that only a person can pass in Tessera. */
 export const HUMAN_ONLY_TOOLS = new Set([
   "answer_dataset_month_questions",
   "approve_dataset_month",
+  "delete_dashboard",
+  "delete_dataset",
 ]);
 
 /** Operations registered directly, outside the gateway. */

@@ -74,6 +74,7 @@
   color: #dcecf9;
   font-size: 11.5px;
   font-weight: 700;
+  margin-right: 2px;
   white-space: nowrap;
 }
 
@@ -106,8 +107,7 @@
 }
 
 .topbar__save,
-.topbar .webmcp-status,
-.topbar .folder-sync {
+.topbar .webmcp-status {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -121,37 +121,6 @@
   color: #173b61;
   background: var(--tessera-columbia-blue-soft);
   border-color: var(--tessera-columbia-blue-border);
-}
-
-.topbar .folder-sync {
-  color: #d8ebf8;
-  background: rgb(226 242 252 / 0.1);
-  border-color: rgb(158 202 230 / 0.34);
-}
-
-.topbar .folder-sync:hover,
-.topbar .folder-sync:focus-visible {
-  color: #fff;
-  background: rgb(226 242 252 / 0.18);
-  border-color: rgb(158 202 230 / 0.65);
-}
-
-.topbar .folder-sync.is-synced {
-  color: #143e62;
-  background: #e6f4ff;
-  border-color: #9ecae6;
-}
-
-.topbar .folder-sync.is-syncing {
-  color: #294d6d;
-  background: #dceef9;
-}
-
-.topbar .folder-sync.is-error,
-.topbar .folder-sync.is-needs-permission {
-  color: #684c10;
-  background: #fff2c7;
-  border-color: #dfc778;
 }
 
 .topbar__save.is-saving {
@@ -181,7 +150,7 @@
   width: 158px;
   min-width: 146px;
   height: 32px;
-  margin-left: auto;
+  margin-left: 0;
   color: #183e65;
   background: #e6f4ff;
   border: 1px solid #9ecae6;
@@ -232,17 +201,12 @@
   border-bottom-left-radius: 0;
 }
 
-.topbar:has(.month-picker) .topbar__meta {
-  margin-left: 0;
-}
-
 .topbar button:focus-visible {
   outline-color: #9ed5f2;
 }
 
 .topbar__save svg,
-.topbar .webmcp-status svg,
-.topbar .folder-sync svg {
+.topbar .webmcp-status svg {
   width: 12px;
   height: 12px;
 }
@@ -536,6 +500,46 @@
   height: 27px;
 }
 
+.topbar__project-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 1px;
+}
+
+.topbar .topbar__project-action {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  min-height: 27px;
+  padding: 0;
+  place-items: center;
+  color: #c8dced;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.topbar .topbar__project-action:hover,
+.topbar .topbar__project-action:focus-visible {
+  color: #fff;
+  background: rgb(255 255 255 / 0.11);
+}
+
+.topbar .folder-sync.is-synced {
+  color: #a9def5;
+}
+
+.topbar .folder-sync.is-syncing {
+  color: #d7e9f5;
+  opacity: 0.72;
+}
+
+.topbar .folder-sync.is-error,
+.topbar .folder-sync.is-needs-permission {
+  color: #f7d98b;
+}
+
 .topbar .project-picker > svg,
 .topbar .project-picker button,
 .topbar .project-rename {
@@ -697,7 +701,7 @@
 .topbar
   :is(
     .main-nav button,
-    .project-rename,
+    .topbar__project-action,
     .topbar__history button,
     .webmcp-status
   ):focus-visible {

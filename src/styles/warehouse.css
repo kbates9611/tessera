@@ -376,7 +376,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.warehouse-sidebar__sources button span {
+.warehouse-dataset-tab__select span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -429,7 +429,7 @@
 }
 
 .warehouse-sidebar nav button,
-.warehouse-sidebar__sources button {
+.warehouse-dataset-tab__select {
   display: grid;
   grid-template-columns: 19px minmax(0, 1fr) auto;
   align-items: center;
@@ -447,14 +447,14 @@
 }
 
 .warehouse-sidebar nav button:hover,
-.warehouse-sidebar__sources button:hover {
+.warehouse-dataset-tab__select:hover {
   color: var(--blue);
   border-color: #b9cdea;
   background: #fff;
 }
 
 .warehouse-sidebar nav button.is-active,
-.warehouse-sidebar__sources button.is-active {
+.warehouse-dataset-tab.is-active .warehouse-dataset-tab__select {
   color: var(--navy);
   background: #eaf0f9;
   border-color: var(--blue);
@@ -477,7 +477,7 @@
   color: #7c889b;
 }
 
-.warehouse-browser .warehouse-sidebar__sources > button small {
+.warehouse-browser .warehouse-dataset-tab__select small {
   color: #748095;
   font-size: 10px;
 }
@@ -498,7 +498,7 @@
   background: #edf1f6;
 }
 
-.warehouse-browser .warehouse-sidebar__sources > button > span {
+.warehouse-browser .warehouse-dataset-tab__select > span {
   display: grid;
   min-width: 0;
 }
@@ -516,12 +516,14 @@
   font-style: normal;
 }
 
-.warehouse-browser .warehouse-sidebar__sources > button:hover {
+.warehouse-browser .warehouse-dataset-tab__select:hover {
   color: var(--warehouse-blue-950);
   background: var(--warehouse-blue-50);
 }
 
-.warehouse-browser .warehouse-sidebar__sources > button.is-active {
+.warehouse-browser
+  .warehouse-dataset-tab.is-active
+  .warehouse-dataset-tab__select {
   color: var(--warehouse-blue-950);
   background: var(--warehouse-blue-100);
   border-color: var(--warehouse-blue-300);
@@ -561,7 +563,7 @@
   gap: 5px;
 }
 
-.warehouse-browser .warehouse-sidebar__sources > button {
+.warehouse-browser .warehouse-dataset-tab__select {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr) auto;
   align-items: center;
@@ -594,11 +596,72 @@
   text-transform: uppercase;
 }
 
-.warehouse-sidebar__sources > button > svg {
+.warehouse-dataset-tab__select > svg {
   width: 15px;
   height: 15px;
   color: #365c81;
   stroke-width: 2.2;
+}
+
+.warehouse-dataset-tab {
+  position: relative;
+  min-width: 0;
+}
+
+.warehouse-dataset-tab__select > small,
+.warehouse-dataset-tab__select > svg:last-child {
+  transition: opacity 140ms ease;
+}
+
+.warehouse-dataset-tab__delete {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 7px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  color: #758298;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.warehouse-dataset-tab:hover .warehouse-dataset-tab__delete,
+.warehouse-dataset-tab:focus-within .warehouse-dataset-tab__delete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.warehouse-dataset-tab:hover .warehouse-dataset-tab__select > small,
+.warehouse-dataset-tab:hover .warehouse-dataset-tab__select > svg:last-child,
+.warehouse-dataset-tab:focus-within .warehouse-dataset-tab__select > small,
+.warehouse-dataset-tab:focus-within
+  .warehouse-dataset-tab__select
+  > svg:last-child {
+  opacity: 0;
+}
+
+.warehouse-dataset-tab__delete:hover {
+  color: #a3212d;
+  background: #fde8ea;
+}
+
+@media (hover: none) {
+  .warehouse-dataset-tab__delete {
+    opacity: 0.72;
+    pointer-events: auto;
+  }
+
+  .warehouse-dataset-tab .warehouse-dataset-tab__select > small,
+  .warehouse-dataset-tab .warehouse-dataset-tab__select > svg:last-child {
+    opacity: 0;
+  }
 }
 
 /* Workbench */
@@ -1417,6 +1480,29 @@
 
 .warehouse-table-nav__dataset {
   padding: 18px 16px 16px;
+}
+
+.warehouse-table-nav__dataset > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.warehouse-table-nav__delete {
+  display: none;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  place-items: center;
+  color: #8b5360;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.warehouse-table-nav__delete:hover {
+  color: #a3212d;
+  background: #fde8ea;
 }
 
 .warehouse-table-nav__dataset h2 {

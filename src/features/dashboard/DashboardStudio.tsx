@@ -21,11 +21,15 @@ import {
   Sparkles,
   Table2,
   Trash2,
+  X,
   type LucideIcon,
 } from "lucide-react";
+import { ConfirmDeleteDialog } from "../../app/ConfirmDeleteDialog";
 import type { CommandBus } from "../../domain/commands";
 import { KIT_LIST, kitFor } from "../../domain/kits";
 import {
+  dashboardPeriod,
+  dashboardSeriesId,
   dashboardSeriesName,
   dashboardsForPeriod,
   reportingPeriodLabel,
@@ -171,6 +175,9 @@ export function DashboardStudio({
   const visibleDashboards = dashboardsForPeriod(project, reportingPeriod);
   const [drag, setDrag] = useState<DragPayload | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  const [deleteDashboardId, setDeleteDashboardId] = useState<string | null>(
+    null,
+  );
   const [headerEditor, setHeaderEditor] = useState<{
     field: EditableHeaderField;
     value: string;
@@ -181,6 +188,24 @@ export function DashboardStudio({
   const selectedIndex = selected
     ? dashboard.blocks.findIndex((block) => block.id === selected.id)
     : -1;
+  const deleteTarget = project.dashboards.find(
+    (item) => item.id === deleteDashboardId,
+  );
+  const deleteSeriesId = deleteTarget
+    ? dashboardSeriesId(project, deleteTarget)
+    : undefined;
+  const deletePeriod = deleteTarget
+    ? dashboardPeriod(project, deleteTarget)
+    : undefined;
+  const deleteEditions = deleteSeriesId
+    ? project.dashboards.filter(
+        (item) => dashboardSeriesId(project, item) === deleteSeriesId,
+      )
+    : [];
+  const deleteBlockCount = deleteEditions.reduce(
+    (total, item) => total + item.blocks.length,
+    0,
+  );
   const sectionLinks = dashboardSections(dashboard);
   const [activeSectionId, setActiveSectionId] = useState<string | undefined>(
     sectionLinks[0]?.id,
@@ -894,25 +919,41 @@ export function DashboardStudio({
               </option>
             ))}
           </select>
-          {visibleDashboards.map((item) => (
-            <button
-              key={item.id}
-              role="tab"
-              aria-selected={item.id === dashboard.id}
-              className={item.id === dashboard.id ? "is-active" : ""}
-              onClick={() => {
-                void bus.execute("activate_dashboard", {
-                  dashboardId: item.id,
-                });
-                onSelectBlock(undefined);
-              }}
-            >
-              <span>{dashboardSeriesName(project, item)}</span>
-              {item.edition?.status === "draft" && (
-                <small className="dashboard-tab__status">Draft</small>
-              )}
-            </button>
-          ))}
+          {visibleDashboards.map((item) => {
+            const name = dashboardSeriesName(project, item);
+            return (
+              <div className="dashboard-tab" role="presentation" key={item.id}>
+                <button
+                  role="tab"
+                  aria-selected={item.id === dashboard.id}
+                  className={`dashboard-tab__select${item.id === dashboard.id ? " is-active" : ""}`}
+                  onClick={() => {
+                    void bus.execute("activate_dashboard", {
+                      dashboardId: item.id,
+                    });
+                    onSelectBlock(undefined);
+                  }}
+                >
+                  <span>{name}</span>
+                  {item.edition?.status === "draft" && (
+                    <small className="dashboard-tab__status">Draft</small>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="dashboard-tab__delete"
+                  aria-label={`Delete dashboard ${name}`}
+                  title={`Delete ${name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setDeleteDashboardId(item.id);
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            );
+          })}
           <button
             className="dashboard-tabs__add"
             onClick={onNewDashboard}
@@ -1339,6 +1380,46 @@ export function DashboardStudio({
             <Trash2 size={13} /> Delete
           </button>
         </div>
+      )}
+
+      {deleteTarget && (
+        <ConfirmDeleteDialog
+          title={`Delete “${dashboardSeriesName(project, deleteTarget)}”?`}
+          description={
+            deleteEditions.length === 1
+              ? `This removes the ${deletePeriod ? reportingPeriodLabel(deletePeriod) : "current"} dashboard and its ${deleteBlockCount} block${deleteBlockCount === 1 ? "" : "s"}.`
+              : `This removes ${deleteEditions.length} monthly editions and ${deleteBlockCount} block${deleteBlockCount === 1 ? "" : "s"} from ${project.name}.`
+          }
+          impactTitle={
+            project.dashboards.length === deleteEditions.length
+              ? "A fresh blank dashboard will take its place."
+              : "Your datasets will stay in the warehouse."
+          }
+          impact={
+            project.dashboards.length === deleteEditions.length
+              ? "The project will keep one empty canvas, and all warehouse datasets will stay intact."
+              : "No warehouse datasets or other dashboards will be changed."
+          }
+          confirmLabel="Delete dashboard"
+          onClose={() => setDeleteDashboardId(null)}
+          onConfirm={async () => {
+            const deletingActive = deleteEditions.some(
+              (item) => item.id === dashboard.id,
+            );
+            await bus.execute("delete_dashboard", {
+              dashboardId: deleteTarget.id,
+            });
+            if (deletingActive) onSelectBlock(undefined);
+            window.requestAnimationFrame(() => {
+              const nextFocus = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                  ".dashboard-tabs [role='tab'][aria-selected='true'], .dashboard-tabs__add",
+                ),
+              ).find((element) => element.offsetParent !== null);
+              nextFocus?.focus();
+            });
+          }}
+        />
       )}
     </main>
   );

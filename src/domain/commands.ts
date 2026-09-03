@@ -424,6 +424,95 @@ export class CommandBus {
         },
       },
       {
+        name: "delete_dashboard",
+        title: "Delete dashboard",
+        description:
+          "Human-only safety gate. Delete an entire dashboard series, including each of its monthly editions.",
+        inputSchema: objectSchema(
+          { dashboardId: stringProp("Dashboard ID in the series to delete") },
+          ["dashboardId"],
+        ),
+        readOnly: false,
+        execute: (args, source) => {
+          if (source === "webmcp")
+            throw new Error(
+              "Dashboards must be deleted by the user in Tessera.",
+            );
+          const dashboardId = String(args.dashboardId);
+          const currentProject = activeProject(this.#context.getState());
+          const target = requiredDashboard(currentProject, dashboardId);
+          const seriesId = dashboardSeriesId(currentProject, target);
+          const seriesName = dashboardSeriesName(currentProject, target);
+          const removed = currentProject.dashboards.filter(
+            (candidate) =>
+              dashboardSeriesId(currentProject, candidate) === seriesId,
+          );
+          const removedIds = new Set(removed.map((item) => item.id));
+          const activeWasRemoved = removedIds.has(
+            currentProject.activeDashboardId,
+          );
+          const activeBefore = currentProject.dashboards.find(
+            (item) => item.id === currentProject.activeDashboardId,
+          );
+          const preferredPeriod = activeBefore
+            ? dashboardPeriod(currentProject, activeBefore)
+            : dashboardPeriod(currentProject, target);
+          const blockCount = removed.reduce(
+            (total, item) => total + item.blocks.length,
+            0,
+          );
+          let result;
+
+          this.updateActiveProject(
+            "delete_dashboard",
+            source,
+            `Deleted dashboard ${seriesName}`,
+            (project) => {
+              project.dashboards = project.dashboards.filter(
+                (candidate) => !removedIds.has(candidate.id),
+              );
+              project.dashboards.forEach((candidate) => {
+                if (
+                  candidate.edition?.sourceDashboardId &&
+                  removedIds.has(candidate.edition.sourceDashboardId)
+                )
+                  delete candidate.edition.sourceDashboardId;
+              });
+
+              let replacementCreated = false;
+              if (!project.dashboards.length) {
+                const replacement = createDashboard(
+                  "Dashboard 1",
+                  preferredPeriod,
+                );
+                project.dashboards.push(replacement);
+                project.activeDashboardId = replacement.id;
+                replacementCreated = true;
+              } else if (activeWasRemoved) {
+                const next =
+                  project.dashboards.find(
+                    (candidate) =>
+                      dashboardPeriod(project, candidate) === preferredPeriod,
+                  ) ?? project.dashboards[0];
+                project.activeDashboardId = next.id;
+              }
+
+              result = {
+                dashboardId,
+                seriesId,
+                name: seriesName,
+                removedDashboardIds: [...removedIds],
+                removedEditionCount: removed.length,
+                removedBlockCount: blockCount,
+                activeDashboardId: project.activeDashboardId,
+                replacementCreated,
+              };
+            },
+          );
+          return result;
+        },
+      },
+      {
         name: "set_dashboard_kit",
         title: "Apply a brand kit",
         description:
@@ -802,6 +891,56 @@ export class CommandBus {
             },
           );
           return asset;
+        },
+      },
+      {
+        name: "delete_dataset",
+        title: "Delete warehouse dataset",
+        description:
+          "Human-only safety gate. Delete one dataset and all of its monthly tables while leaving dashboard cards in place with their data bindings cleared.",
+        inputSchema: objectSchema(
+          { datasetId: stringProp("Dataset ID to delete") },
+          ["datasetId"],
+        ),
+        readOnly: false,
+        execute: (args, source) => {
+          if (source === "webmcp")
+            throw new Error("Datasets must be deleted by the user in Tessera.");
+          const datasetId = String(args.datasetId);
+          const currentProject = activeProject(this.#context.getState());
+          const target = requiredAsset(currentProject, datasetId);
+          const monthCount = target.months.length;
+          let result;
+
+          this.updateActiveProject(
+            "delete_dataset",
+            source,
+            `Deleted dataset ${target.name}`,
+            (project) => {
+              project.warehouse = project.warehouse.filter(
+                (candidate) => candidate.id !== datasetId,
+              );
+              const now = new Date().toISOString();
+              let disconnectedBlockCount = 0;
+              project.dashboards.forEach((dashboard) => {
+                let dashboardChanged = false;
+                dashboard.blocks.forEach((block) => {
+                  if (block.datasetId !== datasetId) return;
+                  clearDatasetBinding(block, now);
+                  dashboardChanged = true;
+                  disconnectedBlockCount += 1;
+                });
+                if (dashboardChanged) dashboard.updatedAt = now;
+              });
+              result = {
+                datasetId,
+                name: target.name,
+                removedMonthCount: monthCount,
+                disconnectedBlockCount,
+              };
+            },
+          );
+          return result;
         },
       },
       {
@@ -4589,6 +4728,43 @@ function leafFieldPaths(value: Record<string, unknown>, prefix = ""): string[] {
       return [path];
     })
     .sort();
+}
+
+function clearDatasetBinding(block: DashboardBlock, updatedAt: string) {
+  delete block.datasetId;
+  delete block.categoryField;
+  delete block.labelField;
+  delete block.seriesField;
+  delete block.targetField;
+  delete block.valueField;
+  block.valueFields = [];
+  block.period = "latest";
+  block.table = {
+    ...block.table,
+    visibleColumns: [],
+    sortColumn: "",
+    sortDirection: "none",
+    sortRules: [],
+    totalColumns: [],
+    colorByColumn: "",
+    groupColors: [],
+    columnStyles: [],
+    cellStyles: [],
+  };
+  block.chart = {
+    ...block.chart,
+    barColorOverrides: [],
+    lineSeriesStyles: [],
+    linePointStyles: [],
+    heatmapCellStyles: [],
+    donutSliceStyles: [],
+    treemapTileStyles: [],
+    sankeyNodeOverrides: [],
+    sankeyLinkOverrides: [],
+    highlightNodes: [],
+    scatterPointStyles: [],
+  };
+  block.updatedAt = updatedAt;
 }
 
 function applySettingsArgs(

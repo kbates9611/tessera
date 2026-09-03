@@ -219,13 +219,6 @@ export function App() {
               }}
               onNew={() => setDialog("project")}
             />
-            <button
-              className="project-rename"
-              onClick={() => setDialog("rename")}
-              aria-label="Rename dashboard group"
-            >
-              <Pencil size={13} />
-            </button>
           </div>
 
           <nav className="main-nav" aria-label="Project sections">
@@ -246,28 +239,27 @@ export function App() {
             </button>
           </nav>
 
-          {view === "dashboard" && availableDashboardMonths.length > 0 && (
-            <TopbarPicker
-              ariaLabel="Dashboard month"
-              listLabel="Dashboard months"
-              value={dashboardMonth}
-              options={availableDashboardMonths.map((period) => ({
-                value: period,
-                label: reportingPeriodLabel(period),
-              }))}
-              onSelect={openDashboardMonth}
-              icon={<CalendarDays size={14} aria-hidden="true" />}
-              variant="month-picker"
-            />
-          )}
-
-          <div className="topbar__meta" aria-label="Workspace status">
+          <div
+            className="topbar__project-actions"
+            role="group"
+            aria-label="Project settings"
+          >
+            <button
+              type="button"
+              className="topbar__project-action project-rename"
+              onClick={() => setDialog("rename")}
+              aria-label="Rename dashboard group"
+              title="Rename dashboard group"
+            >
+              <Pencil size={13} aria-hidden="true" />
+            </button>
             {folderSync.supported && (
               <button
                 type="button"
-                className={`folder-sync is-${folderSync.status}`}
+                className={`topbar__project-action folder-sync is-${folderSync.status}`}
                 onClick={() => void connectWorkspaceFolder()}
                 disabled={folderSync.status === "syncing"}
+                aria-busy={folderSync.status === "syncing"}
                 aria-label={
                   folderSync.status === "synced"
                     ? `Workspace folder ${folderSync.name ?? "connected"}`
@@ -280,18 +272,12 @@ export function App() {
                     : "Keep projects as readable JSON files on this computer")
                 }
               >
-                <FolderSync size={12} />
-                {folderSync.status === "synced"
-                  ? "Folder synced"
-                  : folderSync.status === "syncing"
-                    ? "Syncing…"
-                    : folderSync.status === "needs-permission"
-                      ? "Reconnect folder"
-                      : folderSync.status === "error"
-                        ? "Folder issue"
-                        : "Save folder"}
+                <FolderSync size={13} aria-hidden="true" />
               </button>
             )}
+          </div>
+
+          <div className="topbar__meta" aria-label="Workspace status">
             <span className={`topbar__save is-${saveState}`}>
               <Check size={11} /> {saveLabel}
             </span>
@@ -308,6 +294,21 @@ export function App() {
                 : `Agent ready · ${webmcp.toolCount} operations`}
             </button>
           </div>
+
+          {view === "dashboard" && availableDashboardMonths.length > 0 && (
+            <TopbarPicker
+              ariaLabel="Dashboard month"
+              listLabel="Dashboard months"
+              value={dashboardMonth}
+              options={availableDashboardMonths.map((period) => ({
+                value: period,
+                label: reportingPeriodLabel(period),
+              }))}
+              onSelect={openDashboardMonth}
+              icon={<CalendarDays size={14} aria-hidden="true" />}
+              variant="month-picker"
+            />
+          )}
 
           <div
             className="topbar__history"

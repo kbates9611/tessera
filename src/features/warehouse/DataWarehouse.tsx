@@ -8,7 +8,9 @@ import {
   GitBranch,
   Plus,
   Table2,
+  X,
 } from "lucide-react";
+import { ConfirmDeleteDialog } from "../../app/ConfirmDeleteDialog";
 import type { CommandBus } from "../../domain/commands";
 import type {
   DataAsset,
@@ -44,6 +46,7 @@ type Dialog =
   | { kind: "details" }
   | { kind: "editions"; period: string }
   | { kind: "recipe"; assetId: string }
+  | { kind: "delete-dataset"; assetId: string }
   | null;
 
 export function DataWarehouse({
@@ -79,6 +82,20 @@ export function DataWarehouse({
   const drafted = hasCleanDraft(month);
   const effectiveView: DataView = drafted ? view : "original";
   const outline = useOutline(project, asset, month, bus);
+  const deleteTarget =
+    dialog?.kind === "delete-dataset"
+      ? project.warehouse.find((item) => item.id === dialog.assetId)
+      : undefined;
+  const deleteBindingCount = deleteTarget
+    ? project.dashboards.reduce(
+        (total, dashboard) =>
+          total +
+          dashboard.blocks.filter(
+            (block) => block.datasetId === deleteTarget.id,
+          ).length,
+        0,
+      )
+    : 0;
   const totalVersions = project.warehouse.reduce(
     (total, item) =>
       total +
@@ -90,10 +107,14 @@ export function DataWarehouse({
   );
 
   useEffect(() => {
-    if (!asset) return;
-    if (!selectedAssetId) onSelectAsset(asset.id);
-    if (!selectedPeriod && asset.months.length)
-      onSelectPeriod(selectMonth(asset)?.period);
+    if (!asset) {
+      if (selectedAssetId !== undefined) onSelectAsset(undefined);
+      if (selectedPeriod !== undefined) onSelectPeriod(undefined);
+      return;
+    }
+    if (selectedAssetId !== asset.id) onSelectAsset(asset.id);
+    const nextPeriod = selectMonth(asset, selectedPeriod)?.period;
+    if (selectedPeriod !== nextPeriod) onSelectPeriod(nextPeriod);
   }, [asset, onSelectAsset, onSelectPeriod, selectedAssetId, selectedPeriod]);
 
   useEffect(() => {
@@ -210,6 +231,9 @@ export function DataWarehouse({
             project={project}
             asset={asset}
             onSelect={openMonth}
+            onDelete={(item) =>
+              setDialog({ kind: "delete-dataset", assetId: item.id })
+            }
           />
 
           {section === "recipes" ? (
@@ -323,6 +347,9 @@ export function DataWarehouse({
                   }}
                   onSelectView={setView}
                   onAddMonth={() => setDialog({ kind: "month" })}
+                  onDeleteDataset={() =>
+                    setDialog({ kind: "delete-dataset", assetId: asset.id })
+                  }
                   onOpenDetails={() => setDialog({ kind: "details" })}
                   onAnswerQuestions={() => setDialog({ kind: "questions" })}
                   onEditions={(period) =>
@@ -413,6 +440,54 @@ export function DataWarehouse({
           }}
         />
       )}
+      {deleteTarget && (
+        <ConfirmDeleteDialog
+          title={`Delete “${deleteTarget.name}”?`}
+          description={
+            deleteTarget.months.length
+              ? `This removes ${deleteTarget.months.length} monthly version${deleteTarget.months.length === 1 ? "" : "s"}, their working tables, and the saved cleaning recipe from ${project.name}. Existing source uploads remain in storage so Undo can restore them.`
+              : `This removes the empty dataset and its saved cleaning recipe from ${project.name}.`
+          }
+          impactTitle={
+            deleteBindingCount
+              ? `${deleteBindingCount} dashboard card${deleteBindingCount === 1 ? "" : "s"} will be disconnected.`
+              : "Your dashboards will stay as they are."
+          }
+          impact={
+            deleteBindingCount
+              ? "The cards will stay in place and can be connected to another dataset."
+              : "No dashboard cards currently use this dataset."
+          }
+          confirmLabel="Delete dataset"
+          onClose={() => setDialog(null)}
+          onConfirm={async () => {
+            const deletingSelected = asset?.id === deleteTarget.id;
+            const next = project.warehouse.find(
+              (item) => item.id !== deleteTarget.id,
+            );
+            if (deletingSelected && outline.active) outline.cancel();
+            await bus.execute("delete_dataset", {
+              datasetId: deleteTarget.id,
+            });
+            if (deletingSelected) {
+              onSelectAsset(next?.id);
+              onSelectPeriod(selectMonth(next)?.period);
+              setView(
+                hasCleanDraft(selectMonth(next)) ? "cleaned" : "original",
+              );
+              setSection("table");
+            }
+            window.requestAnimationFrame(() => {
+              const nextFocus = Array.from(
+                document.querySelectorAll<HTMLElement>(
+                  ".warehouse-sidebar__sources [role='tab'][aria-selected='true'], .warehouse-table-nav__dataset h2, .warehouse-empty .primary-button",
+                ),
+              ).find((element) => element.offsetParent !== null);
+              nextFocus?.focus();
+            });
+          }}
+        />
+      )}
     </main>
   );
 }
@@ -421,10 +496,12 @@ function DatasetBrowser({
   project,
   asset,
   onSelect,
+  onDelete,
 }: {
   project: TesseraProject;
   asset?: DataAsset;
   onSelect: (asset: DataAsset) => void;
+  onDelete: (asset: DataAsset) => void;
 }) {
   return (
     <aside className="warehouse-sidebar warehouse-browser">
@@ -442,28 +519,45 @@ function DatasetBrowser({
             (month) => month.status === "pending",
           ).length;
           return (
-            <button
-              role="tab"
+            <div
+              className={`warehouse-dataset-tab${active ? " is-active" : ""}`}
+              role="presentation"
               key={item.id}
-              className={active ? "is-active" : ""}
-              onClick={() => onSelect(item)}
-              aria-selected={active}
             >
-              <Table2 size={13} />
-              <span>
-                <b>{item.name}</b>
-                <em>
-                  {item.months.length} month
-                  {item.months.length === 1 ? "" : "s"}
-                  {pending ? ` · ${pending} pending` : ""}
-                </em>
-              </span>
-              {pending ? (
-                <Clock3 size={12} />
-              ) : (
-                <small>{item.months.length}</small>
-              )}
-            </button>
+              <button
+                role="tab"
+                className="warehouse-dataset-tab__select"
+                onClick={() => onSelect(item)}
+                aria-selected={active}
+              >
+                <Table2 size={13} />
+                <span>
+                  <b>{item.name}</b>
+                  <em>
+                    {item.months.length} month
+                    {item.months.length === 1 ? "" : "s"}
+                    {pending ? ` · ${pending} pending` : ""}
+                  </em>
+                </span>
+                {pending ? (
+                  <Clock3 size={12} />
+                ) : (
+                  <small>{item.months.length}</small>
+                )}
+              </button>
+              <button
+                type="button"
+                className="warehouse-dataset-tab__delete"
+                aria-label={`Delete dataset ${item.name}`}
+                title={`Delete ${item.name}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onDelete(item);
+                }}
+              >
+                <X size={12} />
+              </button>
+            </div>
           );
         })}
       </div>

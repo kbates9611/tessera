@@ -162,7 +162,8 @@ export function AgentPanel({
           <Check size={13} />
           <span>
             Everything the agent can do, you can also do by hand. Approving
-            cleaned data and answering cleaning questions stay with you.
+            cleaned data, answering cleaning questions, and confirming deletions
+            stay with you.
           </span>
         </footer>
       </div>

@@ -602,6 +602,7 @@ export function TableNavigator({
   onSelectPeriod,
   onSelectView,
   onAddMonth,
+  onDeleteDataset,
   onOpenDetails,
   onAnswerQuestions,
   onEditions,
@@ -617,6 +618,7 @@ export function TableNavigator({
   onSelectPeriod: (period: string) => void;
   onSelectView: (view: DataView) => void;
   onAddMonth: () => void;
+  onDeleteDataset: () => void;
   onOpenDetails: () => void;
   onAnswerQuestions: () => void;
   onEditions: (period: string) => void;
@@ -632,8 +634,19 @@ export function TableNavigator({
   return (
     <aside className="warehouse-table-nav" aria-label="Table navigation">
       <header className="warehouse-table-nav__dataset">
-        <span className="eyebrow">DATASET</span>
-        <h2>{asset.name}</h2>
+        <div>
+          <span className="eyebrow">DATASET</span>
+          <button
+            type="button"
+            className="warehouse-table-nav__delete"
+            aria-label={`Delete dataset ${asset.name}`}
+            title={`Delete ${asset.name}`}
+            onClick={onDeleteDataset}
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+        <h2 tabIndex={-1}>{asset.name}</h2>
         <p>
           {asset.description ||
             "One table, one immutable original and one cleaned version per month."}
