@@ -1,0 +1,65 @@
+/* Design tokens */
+:root {
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  color: #1b2430;
+  background: #eef1f6;
+
+  --font-display: Georgia, "Times New Roman", serif;
+
+  /* Ink and surfaces */
+  --navy: #1c2b4a;
+  --navy-2: #17203a;
+  --blue: #2c5697;
+  --blue-strong: #23477f;
+  --blue-pale: #eaf0f9;
+  --paper: #f4f4f2;
+  --warm: #f4f4f2;
+  --surface: #fff;
+  --ink: #17203a;
+  --muted: #5d6b80;
+  --subtle: #8894a6;
+  --line: #dde4ee;
+  --line-strong: #cdd5e2;
+  --green: #1f7a4d;
+  --red: #a33227;
+  --amber: #a8801f;
+  --radius: 10px;
+
+  /* Agent accent */
+  --agent-teal: #00d8c3;
+  --agent-teal-ink: #0b7a8a;
+  --agent-teal-line: #a6e6e6;
+  --agent-teal-soft: #edfbfb;
+  --agent-teal-rule: #1aa7b8;
+  --agent-glow: 0 0 8px rgb(25 125 255 / 0.16), 0 0 12px rgb(0 216 195 / 0.22);
+  --shadow-soft:
+    0 1px 2px rgb(16 25 43 / 0.06), 0 8px 24px rgb(16 25 43 / 0.08);
+  --shadow-raised:
+    0 3px 10px rgb(16 25 43 / 0.12), 0 18px 42px rgb(16 25 43 / 0.12);
+
+  /* Dark chrome (selection toolbar) */
+  --chrome: #10192b;
+  --chrome-2: #182642;
+  --chrome-line: #29374f;
+  --chrome-ink: #e8edf6;
+  --chrome-dim: #92a0b8;
+
+  /* Navy header and baby-blue paper */
+  --tessera-baby-blue: #f7fbfe;
+  --tessera-baby-blue-stage: #eef7fc;
+  --tessera-columbia-blue: #b9d9eb;
+  --tessera-columbia-blue-soft: #e4f2fa;
+  --tessera-columbia-blue-border: #b7d5e6;
+  --tessera-header-navy: #102b50;
+  --tessera-header-navy-deep: #0a2142;
+  --tessera-header-navy-hover: #1b436f;
+  --tessera-header-control-blue: rgb(104 171 218 / 0.24);
+  --tessera-header-control-blue-soft: rgb(104 171 218 / 0.18);
+}

@@ -1,0 +1,13 @@
+{
+  "name": "tessera",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "index.js",
+  "no_bundle": true,
+  "assets": {
+    "directory": "../client"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

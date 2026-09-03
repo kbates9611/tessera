@@ -1,0 +1,352 @@
+/* Axes, grid, values */
+
+.chart-axis-title {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.donut-label {
+  font-family: "DM Sans", sans-serif;
+}
+
+.treemap-label,
+.treemap-value {
+  fill: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.treemap-value {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.heatmap-heading,
+.heatmap-row-label,
+.heatmap-value {
+  fill: #5e6c81;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+}
+
+.chart-value {
+  font-weight: 700;
+}
+
+.chart-reference-label {
+  font-weight: 800;
+}
+
+.chart-axis-label,
+.chart-value,
+.chart-reference-label,
+.sankey-label {
+  font-family: "DM Sans", sans-serif;
+  fill: #5d6b80;
+}
+
+.chart-axis-label,
+.chart-value,
+.chart-reference-label,
+.sankey-label,
+.chart-axis-title,
+.heatmap-heading,
+.heatmap-row-label,
+.heatmap-value,
+.treemap-label,
+.treemap-value,
+.donut-label {
+  font-size: 11px;
+}
+
+.chart-grid {
+  stroke-width: 1;
+  stroke-dasharray: none;
+  stroke: var(--chart-blue-100);
+}
+
+.chart-axis {
+  stroke-width: 1;
+  stroke: var(--chart-blue-200);
+}
+
+.chart-axis-label,
+.chart-axis-title,
+.sankey-stage-label,
+.sankey-label,
+.heatmap-heading,
+.heatmap-row-label,
+.donut-label,
+.gauge-caption {
+  fill: var(--chart-blue-900);
+}
+
+.chart-value,
+.chart-reference-label {
+  fill: var(--chart-blue-700);
+}
+
+.chart-reference {
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+  stroke: var(--chart-blue-600);
+}
+
+.scatter-reference {
+  stroke: var(--chart-blue-600);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.scatter-point .chart-value {
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.chart-empty {
+  display: grid;
+  min-height: 220px;
+  flex: 1;
+  place-items: center;
+  border: 1px dashed #d5dce6;
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--chart-blue-700);
+  background: color-mix(in srgb, var(--chart-blue-100) 34%, #ffffff);
+  border-color: var(--chart-blue-200);
+}
+
+/* Legend */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.chart-legend.is-top {
+  order: -1;
+  margin: 0 0 8px;
+}
+
+.chart-legend.is-right {
+  justify-content: flex-end;
+}
+
+.chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chart-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+}
+
+.chart-legend,
+.chart-legend span,
+.donut-legend span {
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.chart-legend,
+.chart-legend span,
+.donut-legend span,
+.donut-legend b {
+  color: var(--chart-blue-900);
+}
+
+.chart-legend i,
+.donut-legend i {
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px var(--chart-blue-200);
+}
+
+/* Donut */
+
+.donut-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 240px;
+}
+
+.donut-layout svg {
+  width: min(250px, 58%);
+  height: auto;
+}
+
+.donut-layout.is-right {
+  flex-direction: row;
+}
+
+.donut-layout.is-top {
+  flex-direction: column-reverse;
+}
+
+.donut-layout.is-bottom {
+  flex-direction: column;
+}
+
+.donut-total {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.donut-legend {
+  display: grid;
+  gap: 7px;
+  min-width: 120px;
+}
+
+.donut-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.donut-legend b {
+  font-weight: 700;
+}
+
+.donut-legend span {
+  display: grid;
+  grid-template-columns: 7px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+
+.donut-total,
+.gauge-value {
+  fill: var(--chart-blue-900);
+}
+
+/* Gauge */
+
+.chart-block .gauge-chart {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: 150px;
+  margin: auto 0;
+}
+
+.gauge-value {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 34px;
+  font-weight: 650;
+}
+
+.gauge-caption {
+  font-family: "DM Sans", sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* Heatmap */
+
+.heatmap-value {
+  fill: #20334f;
+}
+
+/* Sankey and network */
+
+.sankey-stage-label {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.sankey-link {
+  cursor: pointer;
+  outline: none;
+  stroke: rgb(255 255 255 / 0.7);
+  stroke-linejoin: round;
+  stroke-width: 0.8px;
+  transition:
+    filter 160ms ease,
+    opacity 160ms ease;
+  vector-effect: non-scaling-stroke;
+}
+
+.sankey-link:hover,
+.sankey-link:focus-visible {
+  filter: saturate(1.12) drop-shadow(0 2px 3px rgb(28 43 74 / 0.14));
+  opacity: 0.94;
+  stroke: #fff;
+  stroke-width: 1.35px;
+}
+
+.sankey-link.is-highlighted {
+  filter: saturate(1.08);
+}
+
+.network-node {
+  outline: none;
+}
+
+.sankey-node {
+  stroke: none;
+  transition:
+    filter 160ms ease,
+    stroke-width 160ms ease;
+  vector-effect: non-scaling-stroke;
+}
+
+.network-node:hover .sankey-node,
+.network-node.is-highlighted .sankey-node {
+  filter: saturate(1.12) drop-shadow(0 2px 3px rgb(28 43 74 / 0.2));
+  stroke: #fff;
+  stroke-width: 1.7px;
+}
+
+.sankey-stage-rule {
+  stroke: #cfd8e5;
+  stroke-linecap: round;
+  stroke-width: 1.4px;
+  vector-effect: non-scaling-stroke;
+}
+
+.sankey-label {
+  paint-order: stroke fill;
+  stroke: rgb(255 255 255 / 0.94);
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sankey-label-value {
+  fill: #6b778a;
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.sankey-link-label {
+  fill: #243650;
+  paint-order: stroke fill;
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 3px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.network-node:focus rect,
+.network-node:focus circle {
+  stroke-width: 3px;
+  stroke: var(--chart-blue-700);
+  filter: drop-shadow(0 0 4px rgb(53 95 157 / 0.3));
+}

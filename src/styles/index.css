@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
+@import "./tokens.css";
+@import "./base.css";
+@import "./shell.css";
+@import "./dashboard.css";
+@import "./charts.css";
+@import "./inspector.css";
+@import "./warehouse.css";
+@import "./agent.css";
+@import "./responsive.css";

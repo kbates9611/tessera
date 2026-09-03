@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.tessera-data/
+playwright-report/
+test-results/
+drizzle/*.sql
+*.log

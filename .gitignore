@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.tessera-data/
+playwright-report/
+test-results/
+coverage/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.zip
+*.tar.gz
+*.log

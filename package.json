@@ -1,0 +1,40 @@
+{
+  "name": "tessera",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A project-scoped data warehouse and dashboard studio where every operation is available to people and to WebMCP agents alike.",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names api,ui --prefix-colors blue,magenta \"node --watch server/index.mjs\" \"vite\"",
+    "dev:test": "cross-env TESSERA_TEST_MODE=1 npm run dev",
+    "build": "tsc -b && vite build",
+    "start": "node server/index.mjs --production",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "oxlint src tests vite.config.ts playwright.config.ts",
+    "test:unit": "node --test tests/*.unit.mjs",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:e2e",
+    "check": "npm run format:check && npm run lint && npm run build && npm test"
+  },
+  "dependencies": {
+    "lucide-react": "^1.37.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "read-excel-file": "^9.3.10"
+  },
+  "devDependencies": {
+    "@openai/sites-vite-plugin": "^0.2.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "oxlint": "^1.79.0",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
+  }
+}
