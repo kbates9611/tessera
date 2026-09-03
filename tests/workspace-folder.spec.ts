@@ -22,7 +22,12 @@ test("a chosen workspace folder mirrors JSON files and restores them after brows
   });
   await expect(folderButton).toBeVisible();
   await folderButton.click();
-  await expect(page.getByText("Folder synced", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Workspace folder Tessera workspace",
+      exact: true,
+    }),
+  ).toBeVisible();
 
   await page
     .getByRole("button", { name: "New dashboard", exact: true })
@@ -139,7 +144,10 @@ test("a chosen workspace folder mirrors JSON files and restores them after brows
     restoredPage.getByRole("tab", { name: "Folder recovery test" }),
   ).toBeVisible();
   await expect(
-    restoredPage.getByText("Folder synced", { exact: true }),
+    restoredPage.getByRole("button", {
+      name: "Workspace folder Tessera workspace",
+      exact: true,
+    }),
   ).toBeVisible();
   await restoredPage
     .getByRole("button", { name: "Data Warehouse", exact: true })
